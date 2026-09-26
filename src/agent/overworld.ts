@@ -1143,7 +1143,13 @@ async function decideIntent(ctx: Ctx): Promise<string> {
   // after a Mart visit, shopping is offered again once ¥200 more was earned, or 15 minutes later (can't loop fast either way)
   const shopCooldown = ctx.mem.shopMoney !== undefined && gs.money < ctx.mem.shopMoney + 200 && Date.now() - (ctx.mem.shopAt ?? 0) < 15 * 60_000;
   // a full bag (20 of 20 kinds) can't take anything new: a shop trip can't buy it anything (not offered, like other impossible focuses)
-  if (gs.money < 100 || shopCooldown || gs.bag().length >= 20) delete (criteria as Record<string, string>).shop;
+  if (gs.money < 100 || shopCooldown) delete (criteria as Record<string, string>).shop;
+  // a full bag (20 of 20 kinds) can't take anything new: say so, with what could make room (facts only)
+  if (criteria.shop && gs.bag().length >= 20) {
+    const sellable = gs.bag().filter((i) => !ctx.rom.isKeyItem(i.id) && ctx.rom.itemPrice(i.id) > 0).map((i) => `${i.name} (sells for ¥${Math.floor(ctx.rom.itemPrice(i.id) / 2)})`);
+    if (!sellable.length) delete (criteria as Record<string, string>).shop;
+    else criteria.shop += ` The bag is full (20 of 20 kinds of items): a new kind of item (e.g. REVIVE, FULL RESTORE, POKé BALL) can only be bought after a slot is freed, by selling all of one item at the shop counter (SELL), using it up, or tossing it. Sellable items: ${sellable.join(', ')}.`;
+  }
   // no ball and no way to get one (no money, or a full bag that can't take a new kind of item): catching is impossible
   if (balls === 0 && (gs.money < 200 || gs.bag().length >= 20)) delete (criteria as Record<string, string>).catch;
   criteria.heal = `${INTENTS.heal} Healing at a Pokémon Center is free.${healNote}`;
