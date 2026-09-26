@@ -56,7 +56,7 @@ export interface Memory {
   /** per map: switch presses after which the way was still closed */
   switchNoEffect?: Record<string, number>;
   /** whole-team losses by map: how many, and the team (species + levels) at the last one */
-  losses?: Record<string, { count: number; team: string; moves?: string }>;
+  losses?: Record<string, { count: number; team: string; moves?: string; at?: number }>;
   /** last BILL's PC mode chosen (WITHDRAW/DEPOSIT/RELEASE), for list facts */
   pcMode?: string;
   /** last bag item chosen (for TM/HM party-menu facts) */

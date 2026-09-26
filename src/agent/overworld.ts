@@ -1075,12 +1075,14 @@ function lossBlockedPlace(ctx: Ctx): string | null {
   const levels = (t: string) => t.split(', ').reduce((a, x) => a + +(x.match(/Lv(\d+)$/)?.[1] ?? 0), 0);
   const teamNow = party.map((p) => `${p.species} Lv${p.level}`).join(', ');
   const movesNow = party.flatMap((p) => p.moves.map((m) => m.name)).sort().join(',');
-  const hit = Object.entries(ctx.mem.losses ?? {}).find(([, l]) => l.count >= 2 && lineup(l.team) === lineup(teamNow) && levels(teamNow) - levels(l.team) < 5 && (!l.moves || l.moves === movesNow));
+  const hit = Object.entries(ctx.mem.losses ?? {}).find(([, l]) => l.count >= 2 && lineup(l.team) === lineup(teamNow) && levels(teamNow) - levels(l.team) < 5 && (!l.moves || l.moves === movesNow) && Date.now() - (l.at ?? 0) < LOSS_RETRY_MS);
   return hit ? hit[0] : null;
 }
 // places with a nurse / a shop clerk (the Indigo Plateau lobby has both without being named a Pokémon Center / Mart)
 const PC_MAPS = /POKECENTER|^INDIGO_PLATEAU_LOBBY$/;
 const MART_MAPS = /_MART$|^INDIGO_PLATEAU_LOBBY$/;
+// the loss rule holds at most this long after the last loss (training time before another try)
+const LOSS_RETRY_MS = 10 * 60_000;
 const E4_ROOMS = /^(LORELEIS|BRUNOS|AGATHAS|LANCES|CHAMPIONS)_ROOM$/;
 
 const FOCUS_TTL = 30;
@@ -1151,16 +1153,16 @@ async function decideIntent(ctx: Ctx): Promise<string> {
   if (healed && party.every((p) => p.moves.every((m) => m.pp >= m.maxPp))) delete (criteria as Record<string, string>).heal;
   if (noMartHere) delete (criteria as Record<string, string>).shop;
   // loop rule: the same team lost everything at the same place 2+ times -> 'progress' comes back once the team changes
-  // "changed" = a different lineup, or 5+ levels gained in total since that last loss
+  // "changed" = a different lineup, or 5+ levels gained in total since that last loss; or 10 minutes have passed
   const lineup = (t: string) => t.split(', ').map((x) => x.replace(/ Lv\d+$/, '')).sort().join(',');
   const levels = (t: string) => t.split(', ').reduce((a, x) => a + +(x.match(/Lv(\d+)$/)?.[1] ?? 0), 0);
   const teamNow = party.map((p) => `${p.species} Lv${p.level}`).join(', ');
   const movesNow = party.flatMap((p) => p.moves.map((m) => m.name)).sort().join(',');
   // (not while already inside the Elite Four: there the only way is forward)
-  const stuckAt = E4_ROOMS.test(gs.mapName) ? undefined : Object.entries(ctx.mem.losses ?? {}).find(([, l]) => l.count >= 2 && lineup(l.team) === lineup(teamNow) && levels(teamNow) - levels(l.team) < 5 && (!l.moves || l.moves === movesNow));
+  const stuckAt = E4_ROOMS.test(gs.mapName) ? undefined : Object.entries(ctx.mem.losses ?? {}).find(([, l]) => l.count >= 2 && lineup(l.team) === lineup(teamNow) && levels(teamNow) - levels(l.team) < 5 && (!l.moves || l.moves === movesNow) && Date.now() - (l.at ?? 0) < LOSS_RETRY_MS);
   if (stuckAt) {
     delete (criteria as Record<string, string>).progress;
-    const note = ` (Moving on toward the objective isn't offered right now: all your Pokémon fainted at ${stuckAt[0]} ${stuckAt[1].count} times with exactly this team and these levels. It is offered again once the team changes: a different lineup, a newly learned move, or 5+ levels gained in total since then.)`;
+    const note = ` (Moving on toward the objective isn't offered right now: all your Pokémon fainted at ${stuckAt[0]} ${stuckAt[1].count} times with exactly this team and these levels. It is offered again once the team changes: a different lineup, a newly learned move, or 5+ levels gained in total since then, or 10 minutes after that loss.)`;
     for (const k of Object.keys(criteria)) (criteria as Record<string, string>)[k] += note;
   }
   // nothing to walk toward: the objective needs a field move no team member knows, and there's no place to go for it
