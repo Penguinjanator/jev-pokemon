@@ -1140,7 +1140,8 @@ async function decideIntent(ctx: Ctx): Promise<string> {
   // shop is offered when there's money to spend: ¥100+, and ¥200+ more than when the last shop visit ended
   // after a Mart visit, shopping is offered again once ¥200 more was earned, or 15 minutes later (can't loop fast either way)
   const shopCooldown = ctx.mem.shopMoney !== undefined && gs.money < ctx.mem.shopMoney + 200 && Date.now() - (ctx.mem.shopAt ?? 0) < 15 * 60_000;
-  if (gs.money < 100 || shopCooldown) delete (criteria as Record<string, string>).shop;
+  // a full bag (20 of 20 kinds) can't take anything new: a shop trip can't buy it anything (not offered, like other impossible focuses)
+  if (gs.money < 100 || shopCooldown || gs.bag().length >= 20) delete (criteria as Record<string, string>).shop;
   // no ball and no way to get one (no money, or a full bag that can't take a new kind of item): catching is impossible
   if (balls === 0 && (gs.money < 200 || gs.bag().length >= 20)) delete (criteria as Record<string, string>).catch;
   criteria.heal = `${INTENTS.heal} Healing at a Pokémon Center is free.${healNote}`;
