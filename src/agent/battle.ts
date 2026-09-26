@@ -90,8 +90,8 @@ async function decideBattle(ctx: Ctx) {
     }
     // side effects on the user (Gen 1 rules)
     const SIDE: Record<string, string> = {
-      SELFDESTRUCT: ' The user faints after using it (even if it misses).',
-      EXPLOSION: ' The user faints after using it (even if it misses).',
+      SELFDESTRUCT: ' The user faints after using it (even if it misses), and a fainted Pokémon gets no experience from the win.',
+      EXPLOSION: ' The user faints after using it (even if it misses), and a fainted Pokémon gets no experience from the win.',
       'TAKE DOWN': ' The user takes 1/4 of the damage dealt as recoil.',
       'DOUBLE-EDGE': ' The user takes 1/4 of the damage dealt as recoil.',
       SUBMISSION: ' The user takes 1/4 of the damage dealt as recoil.',
