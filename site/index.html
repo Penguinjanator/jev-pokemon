@@ -4,9 +4,9 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Jev Plays Pokémon Red</title>
-<meta name="description" content="Watch the AI decision model Jev play Pokémon Red in its entirety, live." />
-<meta property="og:title" content="Jev plays Pokémon Red, live" />
-<meta property="og:description" content="Watch the AI decision model Jev play Pokémon Red in its entirety, live." />
+<meta name="description" content="The AI decision model Jev played Pokémon Red all the way to the Hall of Fame. Watch the full recording." />
+<meta property="og:title" content="Jev beat Pokémon Red" />
+<meta property="og:description" content="The AI decision model Jev played Pokémon Red all the way to the Hall of Fame. Watch the full recording." />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://jev-pokemon.vercel.app/" />
 <meta property="og:image" content="https://jev-pokemon.vercel.app/og.png?v=2" />
@@ -14,8 +14,8 @@
 <meta property="og:image:height" content="630" />
 <meta property="og:image:alt" content="Jev plays Pokémon Red: a pixel-art handheld showing Jev deciding between options with odds" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Jev plays Pokémon Red, live" />
-<meta name="twitter:description" content="Watch the AI decision model Jev play Pokémon Red in its entirety, live." />
+<meta name="twitter:title" content="Jev beat Pokémon Red" />
+<meta name="twitter:description" content="The AI decision model Jev played Pokémon Red all the way to the Hall of Fame. Watch the full recording." />
 <meta name="twitter:image" content="https://jev-pokemon.vercel.app/og.png?v=2" />
 <meta name="theme-color" content="#0f380f" />
 <link rel="icon" href="favicon.svg" type="image/svg+xml" />
@@ -72,6 +72,7 @@
   header.wrap { padding-top: 64px; padding-bottom: 24px; }
   .live { display: inline-flex; align-items: center; gap: 10px; color: var(--paper); font-size: 11px; }
   .live i { width: 10px; height: 10px; background: var(--red); animation: blink 1s steps(2, start) infinite; }
+  .live i.done { background: var(--lightest); animation: none; }
   @keyframes blink { to { visibility: hidden; } }
   h1 { margin: 22px 0 0; font-size: clamp(20px, 4.2vw, 36px); line-height: 1.5; font-weight: 400; color: var(--paper);
     text-shadow: 4px 4px 0 var(--dark); }
@@ -138,11 +139,11 @@
 </head>
 <body>
   <header class="wrap">
-    <div class="live"><i></i>LIVE NOW</div>
+    <div class="live"><i class="done"></i>GAME COMPLETE · HALL OF FAME</div>
     <h1>JEV PLAYS<br /><span>POKéMON RED</span></h1>
-    <p class="lede">Watch the AI decision model Jev play Pokémon Red in its entirety, live.</p>
+    <p class="lede">The AI decision model Jev played Pokémon Red all the way to the Hall of Fame. The live stream has ended; watch the full recording below.</p>
     <div class="actions">
-      <a class="btn" href="https://www.youtube.com/watch?v=1HMOA3BawXg" target="_blank" rel="noopener"><span class="arrow">▶</span>WATCH ON YOUTUBE</a>
+      <a class="btn" href="https://www.youtube.com/watch?v=1HMOA3BawXg" target="_blank" rel="noopener"><span class="arrow">▶</span>WATCH THE RECORDING</a>
       <a class="btn alt" href="https://github.com/christianmat/jev-pokemon" target="_blank" rel="noopener">SOURCE CODE</a>
     </div>
   </header>
@@ -150,15 +151,15 @@
   <main class="wrap">
     <div class="console">
       <div class="bezel">
-        <div class="bezel-top"><span class="led"></span><span>JEV LIVE FEED</span><span class="rule"></span></div>
+        <div class="bezel-top"><span class="led"></span><span>JEV REPLAY</span><span class="rule"></span></div>
         <div class="screen">
-          <iframe src="https://www.youtube.com/embed/1HMOA3BawXg?autoplay=1&amp;mute=1&amp;rel=0" title="Jev plays Pokémon Red, live stream"
+          <iframe src="https://www.youtube.com/embed/1HMOA3BawXg?rel=0" title="Jev plays Pokémon Red, full recording"
             allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
         </div>
       </div>
       <div class="brand"><b>JEV</b> BOY</div>
     </div>
-    <p class="hint">STARTS MUTED. UNMUTE FOR GAME AUDIO.<br />THE RIGHT PANEL SHOWS EVERY DECISION AND JEV'S ODDS.</p>
+    <p class="hint">THE FULL RUN, FROM PALLET TOWN TO THE HALL OF FAME.<br />THE RIGHT PANEL SHOWS EVERY DECISION AND JEV'S ODDS.</p>
 
     <section>
       <div class="dialog pixel-box">
