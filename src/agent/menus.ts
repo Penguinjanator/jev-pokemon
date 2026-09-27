@@ -188,7 +188,7 @@ export async function decideMenu(ctx: Ctx, purpose: string, extraFacts: (label: 
     const knows = mv && p.moves.some((m) => m.name === mv.name);
     const candy = ctx.mem.lastItem === 'RARE CANDY' ? ` Would go from Lv${p.level} to Lv${p.level + 1}.` : '';
     const able = candy || ableInfo ? candy + (!ableInfo ? '' : /NOT ABLE/.test(ableRows[p.slot]) ? ' NOT ABLE to use this item (choosing it does nothing).' : knows ? ` Already knows ${mv!.name}: choosing it does nothing.` : ' Able to use this item.') : '';
-    return `${p.species} Lv${p.level}, ${p.types.join('/')}, HP ${p.hp}/${p.maxHp}${p.hp === 0 ? ' (fainted)' : ''}, moves: ${p.moves.map((m) => m.name).join(', ')}.${able}`;
+    return `${p.species} Lv${p.level}, ${p.types.join('/')}, HP ${p.hp}/${p.maxHp}${p.hp === 0 ? ' (fainted)' : ''}${p.status === 'FREEZE' ? ' (FROZEN: cannot use moves; Gen 1 freezing never wears off by itself)' : p.status !== 'OK' && p.hp > 0 ? ` (status: ${p.status})` : ''}, moves: ${p.moves.map((m) => m.name).join(', ')}.${able}`;
   };
   const MENU_FACTS: Record<string, string> = {
     BUY: 'Opens the shop list to buy items such as Poké Balls and Potions.',
