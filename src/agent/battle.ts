@@ -7,7 +7,8 @@ import { sym } from '../game/symbols.js';
 const PHYSICAL = new Set(['NORMAL', 'FIGHTING', 'FLYING', 'POISON', 'GROUND', 'ROCK', 'BUG', 'GHOST']);
 /** The bag list can take a while to open (battle text still printing): wait for it (capped) before searching it. */
 function waitForBag(ctx: Ctx): boolean {
-  for (let i = 0; i < 180; i++) { if (/×|CANCEL/.test(ctx.gs.screen().rows.join(' '))) { ctx.emu.wait(6); return true; } ctx.emu.wait(1); }
+  const names = ctx.gs.bag().map((i) => i.name);
+  for (let i = 0; i < 180; i++) { const t = ctx.gs.screen().rows.join(' '); if (/×|CANCEL/.test(t) || names.some((n) => t.includes(n))) { ctx.emu.wait(6); return true; } ctx.emu.wait(1); }
   return false;
 }
 /** The "Use item on which POKéMON?" party list can take a while to draw: wait for it (capped) before moving the cursor. */
