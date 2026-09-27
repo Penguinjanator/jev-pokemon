@@ -64,7 +64,7 @@ export function cursorTo(ctx: Ctx, text: string, maxPresses = 30): boolean {
     if (!lab) {
       // give the menu time to draw, then assume a scrolling list
       if (waited < 45) { waited += 5; ctx.emu.wait(5); i--; continue; }
-      if (scrolled++ > 25) return false;
+      if (scrolled++ > Math.max(25, maxPresses - 5)) return false;
       tap(ctx, 'DOWN', 6);
       continue;
     }

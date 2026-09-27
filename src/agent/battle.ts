@@ -5,6 +5,11 @@ import { advanceText, isNamingScreen, dialogStep } from './dialog.js';
 import { sym } from '../game/symbols.js';
 
 const PHYSICAL = new Set(['NORMAL', 'FIGHTING', 'FLYING', 'POISON', 'GROUND', 'ROCK', 'BUG', 'GHOST']);
+/** The bag list can take a while to open (battle text still printing): wait for it (capped) before searching it. */
+function waitForBag(ctx: Ctx): boolean {
+  for (let i = 0; i < 180; i++) { if (/×|CANCEL/.test(ctx.gs.screen().rows.join(' '))) { ctx.emu.wait(6); return true; } ctx.emu.wait(1); }
+  return false;
+}
 /** The "Use item on which POKéMON?" party list can take a while to draw: wait for it (capped) before moving the cursor. */
 function waitForPartyPick(ctx: Ctx) {
   for (let i = 0; i < 150 && !/which/.test(ctx.gs.screen().rows.join(' ')); i++) ctx.emu.wait(1);
@@ -130,7 +135,7 @@ async function decideBattle(ctx: Ctx) {
       opts[key] = `Heal the active Pokémon by up to ${HEAL[it.name]} HP (currently ${b.player.hp}/${b.player.maxHp}). ${it.qty} left. Uses the turn.`;
       actions[key] = () => {
         const before = it.qty;
-        if (!select(ctx, 'ITEM')) { ctx.log('info', `item ${it.name}: ITEM not selectable (screen: ${ctx.gs.screen().rows.join('|').replace(/\s+/g, ' ').slice(0, 160)})`); return; }
+        if (!select(ctx, 'ITEM') || !waitForBag(ctx)) { ctx.log('info', `item ${it.name}: ITEM not selectable (screen: ${ctx.gs.screen().rows.join('|').replace(/\s+/g, ' ').slice(0, 160)})`); return; }
         if (!cursorTo(ctx, it.name, 80)) { ctx.log('info', `item ${it.name}: not found in the bag list`); tap(ctx, 'B', 20); return; }
         const a1 = confirmA(ctx);
         waitForPartyPick(ctx);
@@ -147,7 +152,7 @@ async function decideBattle(ctx: Ctx) {
         const key = `Use ${it.name} on ${p.nickname}`;
         opts[key] = `Revive fainted ${p.nickname} (${p.species} Lv${p.level}) to ${it.name === 'MAX REVIVE' ? 'full' : 'half'} HP. It stays out of battle until switched in. ${it.qty} left. Uses the turn.`;
         actions[key] = () => {
-          if (!select(ctx, 'ITEM')) return; if (!cursorTo(ctx, it.name, 80)) { tap(ctx, 'B', 20); return; } confirmA(ctx);
+          if (!select(ctx, 'ITEM')) return; waitForBag(ctx); if (!cursorTo(ctx, it.name, 80)) { tap(ctx, 'B', 20); return; } confirmA(ctx);
           waitForPartyPick(ctx); cursorToIndex(ctx, p.slot); confirmA(ctx);
         };
       }
@@ -158,7 +163,7 @@ async function decideBattle(ctx: Ctx) {
       const key = `Use ${it.name}`;
       opts[key] = `Cures ${party[b.player.slot]?.nickname ?? 'the active Pokémon'}'s ${b.player.status.toLowerCase()} status. ${it.qty} left. Uses the turn.`;
       actions[key] = () => {
-        if (!select(ctx, 'ITEM')) return; if (!cursorTo(ctx, it.name, 80)) { tap(ctx, 'B', 20); return; } confirmA(ctx);
+        if (!select(ctx, 'ITEM')) return; waitForBag(ctx); if (!cursorTo(ctx, it.name, 80)) { tap(ctx, 'B', 20); return; } confirmA(ctx);
         waitForPartyPick(ctx); cursorToIndex(ctx, b.player.slot); confirmA(ctx);
       };
     }
@@ -176,7 +181,7 @@ async function decideBattle(ctx: Ctx) {
       const fit = `${newTypes.length ? `Its type(s) ${newTypes.join('/')} are not on your team yet. ` : 'Your team already has its type(s). '}Its level ${b.enemy.level} is higher than ${lowerThan} of your ${party.length} team members. ${beatsWeakest}${party.length >= 6 ? 'Your team is full: a caught Pokémon goes to the PC box (it can be swapped in at a Pokémon Center PC). ' : ''}`;
       const pc = Math.round(100 * catchChance(it.name, b.enemy.catchRate, b.enemy.hp, b.enemy.maxHp, b.enemy.status));
       opts[key] = `Estimated catch chance ~${pc}% per ${it.name} right now. ${isNew}${fit}${small}Try to catch the wild ${b.enemy.species} (Lv${b.enemy.level}, ${b.enemy.types.join('/')}, catch rate ${b.enemy.catchRate}/255, HP ${b.enemy.hp}/${b.enemy.maxHp}, status ${b.enemy.status}). Lower HP and sleep/paralysis make catching easier. Party size ${party.length}/6. ${it.qty} left.`;
-      actions[key] = () => { if (!select(ctx, 'ITEM')) return; if (cursorTo(ctx, it.name, 80)) confirmA(ctx); else tap(ctx, 'B', 20); };
+      actions[key] = () => { if (!select(ctx, 'ITEM')) return; waitForBag(ctx); if (cursorTo(ctx, it.name, 80)) confirmA(ctx); else tap(ctx, 'B', 20); };
     }
   }
 
