@@ -120,7 +120,7 @@ async function decideBattle(ctx: Ctx) {
     const bestEff = attacks.length ? Math.max(...attacks.map((m) => rom.effectiveness(m.type, b.enemy.types))) : -1;
     const threat = Math.max(...b.enemy.types.map((t) => rom.effectiveness(t, p.types)));
     const key = `Switch to ${p.nickname}`;
-    opts[key] = `Switch to ${p.nickname} (${p.species} Lv${p.level}, ${p.types.join('/')}, HP ${p.hp}/${p.maxHp}). ${bestEff < 0 ? 'It has no damaging moves;' : `Its best damaging move is ${effWord(bestEff)} vs the enemy;`} enemy's type is ${effWord(threat)} against it. Switching uses the turn.${hmPathFact(ctx, p.nickname)}`;
+    opts[key] = `Switch to ${p.nickname} (${p.species} Lv${p.level}, ${p.types.join('/')}, HP ${p.hp}/${p.maxHp}). ${p.status === 'FREEZE' ? 'It is FROZEN: it cannot use any move once switched in (Gen 1 freezing never wears off by itself). ' : p.status === 'SLEEP' ? 'It is ASLEEP: it cannot use a move until it wakes up. ' : ''}${bestEff < 0 ? 'It has no damaging moves;' : `Its best damaging move is ${effWord(bestEff)} vs the enemy;`} enemy's type is ${effWord(threat)} against it. Switching uses the turn.${hmPathFact(ctx, p.nickname)}`;
     actions[key] = () => { if (!select(ctx, 'PKMN')) return; ctx.emu.wait(20); cursorToIndex(ctx, p.slot); confirmA(ctx); if (!select(ctx, 'SWITCH')) tap(ctx, 'B', 20); ctx.emu.wait(20); };
   }
 
