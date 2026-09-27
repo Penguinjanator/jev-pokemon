@@ -8,7 +8,9 @@ const PHYSICAL = new Set(['NORMAL', 'FIGHTING', 'FLYING', 'POISON', 'GROUND', 'R
 /** The "Use item on which POKéMON?" party list can take a while to draw: wait for it (capped) before moving the cursor. */
 function waitForPartyPick(ctx: Ctx) {
   for (let i = 0; i < 150 && !/which/.test(ctx.gs.screen().rows.join(' ')); i++) ctx.emu.wait(1);
-  ctx.emu.wait(4);
+  // the prompt is still printing when it first shows up: input is ignored until it's done
+  for (let i = 0; i < 90 && !/POK.MON\?/.test(ctx.gs.screen().rows.join(' ')); i++) ctx.emu.wait(1);
+  ctx.emu.wait(30);
 }
 const HEAL: Record<string, number> = { POTION: 20, 'SUPER POTION': 50, 'HYPER POTION': 200, 'MAX POTION': 999, 'FULL RESTORE': 999, 'FRESH WATER': 50, 'SODA POP': 60, LEMONADE: 80 };
 const BALLS = ['POKé BALL', 'GREAT BALL', 'ULTRA BALL', 'MASTER BALL', 'SAFARI BALL'];
