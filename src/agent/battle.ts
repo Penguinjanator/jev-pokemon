@@ -74,6 +74,7 @@ async function decideBattle(ctx: Ctx) {
 
   // a frozen / sleeping Pokémon can't use its moves (Gen 1: freezing never wears off by itself)
   const cantAct = b.player.status === 'FREEZE' ? 'FROZEN: this Pokémon cannot use any move (the turn is lost). In Gen 1 freezing never wears off by itself: only an ICE HEAL / FULL HEAL / FULL RESTORE, or being hit by a Fire move, thaws it. ' : b.player.status === 'SLEEP' ? 'ASLEEP: this Pokémon cannot use a move until it wakes up (sleep lasts 1-7 turns). ' : '';
+  const noEffect = new Set<string>();
   for (const mv of b.player.moves) {
     const eff = rom.effectiveness(mv.type, b.enemy.types);
     const phys = PHYSICAL.has(mv.type);
@@ -83,6 +84,7 @@ async function decideBattle(ctx: Ctx) {
     const koNote = b.kind === 'wild' && catching ? ' — knocks it out, so it can no longer be caught' : '';
     const dmg = mv.power ? `Estimated damage ${lo}-${hi} HP vs enemy's ${b.enemy.hp} HP left${lo >= b.enemy.hp ? ` (likely KO${koNote})` : pct > 50 ? ' (high damage)' : ''}.` : `Status move (no direct damage).${(mv.name === 'REFLECT' && (gs.u8('wPlayerBattleStatus3') & 4)) || (mv.name === 'LIGHT SCREEN' && (gs.u8('wPlayerBattleStatus3') & 2)) ? ' Already in effect: using it again does nothing.' : ''}`;
     const key = `Use ${mv.name}`;
+    if (eff === 0 && mv.power > 0 && mv.pp > 0) noEffect.add(key);
     // moves whose damage doesn't follow the power formula (Gen 1 rules)
     const SPECIAL: Record<string, string> = {
       COUNTER: 'Only works right after being hit by a NORMAL or FIGHTING move this turn: returns double that damage. Otherwise it fails and does nothing.',
@@ -191,6 +193,14 @@ async function decideBattle(ctx: Ctx) {
     actions['Run away'] = () => select(ctx, 'RUN');
   }
 
+  // damaging moves the enemy's type is immune to do nothing: not offered while anything else is possible
+  if (noEffect.size) {
+    const others = Object.keys(opts).filter((k) => !noEffect.has(k) && !/: 0 PP left/.test(opts[k]));
+    for (const k of noEffect) {
+      if (others.length) { delete opts[k]; delete actions[k]; }
+      else opts[k] = `NO EFFECT: ${b.enemy.types.join('/')} is immune to this move, it does 0 damage. ${opts[k]}`;
+    }
+  }
   // Pokémon Tower without the SILPH SCOPE: the wild enemy shows only as "GHOST" and the player's Pokémon are too
   // scared to move (the game's IsGhostBattle rule). Report what the player sees, not the hidden species.
   const ghost = gs.inBattle === 1 && /^POKEMON_TOWER_[1-7]F$/.test(gs.mapName) && !gs.bag().some((i) => i.name === 'SILPH SCOPE');
