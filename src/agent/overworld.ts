@@ -1082,7 +1082,7 @@ function lossBlockedPlace(ctx: Ctx): string | null {
 const PC_MAPS = /POKECENTER|^INDIGO_PLATEAU_LOBBY$/;
 const MART_MAPS = /_MART$|^INDIGO_PLATEAU_LOBBY$/;
 // the loss rule holds at most this long after the last loss (training time before another try)
-const LOSS_RETRY_MS = 10 * 60_000;
+const LOSS_RETRY_MS = 0;
 const E4_ROOMS = /^(LORELEIS|BRUNOS|AGATHAS|LANCES|CHAMPIONS)_ROOM$/;
 
 const FOCUS_TTL = 30;
@@ -1168,7 +1168,7 @@ async function decideIntent(ctx: Ctx): Promise<string> {
   const stuckAt = E4_ROOMS.test(gs.mapName) ? undefined : Object.entries(ctx.mem.losses ?? {}).find(([, l]) => l.count >= 2 && lineup(l.team) === lineup(teamNow) && levels(teamNow) - levels(l.team) < 5 && (!l.moves || l.moves === movesNow) && Date.now() - (l.at ?? 0) < LOSS_RETRY_MS);
   if (stuckAt) {
     delete (criteria as Record<string, string>).progress;
-    const note = ` (Moving on toward the objective isn't offered right now: all your Pokémon fainted at ${stuckAt[0]} ${stuckAt[1].count} times with exactly this team and these levels. It is offered again once the team changes: a different lineup, a newly learned move, or 5+ levels gained in total since then, or 10 minutes after that loss.)`;
+    const note = ` (Moving on toward the objective isn't offered right now: all your Pokémon fainted at ${stuckAt[0]} ${stuckAt[1].count} times with exactly this team and these levels. It is offered again once the team changes: a different lineup, a newly learned move, or 5+ levels gained in total since then.)`;
     for (const k of Object.keys(criteria)) (criteria as Record<string, string>)[k] += note;
   }
   // nothing to walk toward: the objective needs a field move no team member knows, and there's no place to go for it

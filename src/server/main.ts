@@ -161,12 +161,21 @@ if (!HEADLESS) {
 }
 
 let paused = false;
+let gameDoneAt = 0;
 let steps = 0;
 let lastAutosave = Date.now();
 async function run() {
   ctx.log('info', `starting — jev=${jev.backend.name}, throttle ${jev.minIntervalMs}ms / ${jev.maxPerMinute} per min`);
   while (!agent.stopped && (!MAX_STEPS || steps < MAX_STEPS)) {
     if (paused) { await new Promise((r) => setTimeout(r, 200)); continue; }
+    // game complete: keep the emulator running so the Hall of Fame and the credits play on stream
+    // (A presses only for the first minutes, to page through the Hall of Fame text; the credits play by themselves)
+    if (gameDoneAt) {
+      emu.wait(30);
+      if (Date.now() - gameDoneAt < 4 * 60_000 && steps++ % 4 === 0) emu.press('A', 4, 8);
+      await new Promise((r) => setImmediate(r));
+      continue;
+    }
     try {
       await agent.step();
     } catch (e) {
@@ -176,7 +185,7 @@ async function run() {
     steps++;
     if (steps % 10 === 0) { broadcast(status()); if (streamer) updateOverlay(lastCall ?? undefined); }
     if (Date.now() - lastAutosave > 5 * 60_000) { agent.save('autosave'); lastAutosave = Date.now(); }
-    if (currentMilestone(gs).m === null) { ctx.log('milestone', '🏆 HALL OF FAME — game complete'); agent.save('hall-of-fame'); break; }
+    if (currentMilestone(gs).m === null && !gameDoneAt) { ctx.log('milestone', '🏆 HALL OF FAME — game complete'); agent.save('hall-of-fame'); gameDoneAt = Date.now(); }
     await new Promise((r) => setImmediate(r));
   }
   const st = status();
