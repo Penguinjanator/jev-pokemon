@@ -127,8 +127,16 @@ async function decideBattle(ctx: Ctx) {
       const key = `Use ${it.name}`;
       opts[key] = `Heal the active Pokémon by up to ${HEAL[it.name]} HP (currently ${b.player.hp}/${b.player.maxHp}). ${it.qty} left. Uses the turn.`;
       actions[key] = () => {
-        if (!select(ctx, 'ITEM')) return; if (!cursorTo(ctx, it.name)) { tap(ctx, 'B', 20); return; } confirmA(ctx);
-        waitForPartyPick(ctx); cursorToIndex(ctx, b.player.slot); confirmA(ctx);
+        const before = it.qty;
+        if (!select(ctx, 'ITEM')) { ctx.log('info', `item ${it.name}: ITEM not selectable (screen: ${ctx.gs.screen().rows.join('|').replace(/\s+/g, ' ').slice(0, 160)})`); return; }
+        if (!cursorTo(ctx, it.name)) { ctx.log('info', `item ${it.name}: not found in the bag list`); tap(ctx, 'B', 20); return; }
+        const a1 = confirmA(ctx);
+        waitForPartyPick(ctx);
+        const picked = cursorToIndex(ctx, b.player.slot);
+        const a2 = confirmA(ctx);
+        ctx.emu.wait(60);
+        const after = ctx.gs.bag().find((x) => x.name === it.name)?.qty ?? 0;
+        if (after >= before) ctx.log('info', `item ${it.name}: not used (A1 ${a1}, target slot ${b.player.slot} picked ${picked}, A2 ${a2}, screen: ${ctx.gs.screen().rows.join('|').replace(/\s+/g, ' ').slice(0, 200)})`);
       };
     }
     // Revive a fainted teammate (they come back but stay benched until switched in)
