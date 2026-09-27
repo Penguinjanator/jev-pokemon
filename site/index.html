@@ -120,6 +120,14 @@
   .choice a:hover::before, .choice a:focus-visible::before { content: "▶\00a0"; }
   .choice a:hover { text-decoration: underline; text-underline-offset: 6px; }
 
+  /* Run stats */
+  .stats { margin: 40px 0 0; padding: 26px 28px 30px; }
+  .stats h2 { margin: 0 0 18px; font-size: 14px; font-weight: 400; color: var(--dark); }
+  .stats dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 18px 28px; margin: 0; }
+  .stats dt { font-size: 9px; color: var(--dark); }
+  .stats dd { margin: 4px 0 0; font-size: 16px; line-height: 1.6; }
+  .stats .team { margin: 22px 0 0; font-size: 10px; line-height: 2.2; }
+
   footer { border-top: 4px solid var(--dark); padding: 26px 0 40px; color: var(--light); font-size: 10px; line-height: 2.2; }
   footer .row { display: flex; justify-content: space-between; gap: 14px 28px; flex-wrap: wrap; }
   footer a { color: var(--paper); text-decoration: none; }
@@ -160,6 +168,21 @@
       <div class="brand"><b>JEV</b> BOY</div>
     </div>
     <p class="hint">THE FULL RUN, FROM PALLET TOWN TO THE HALL OF FAME.<br />THE RIGHT PANEL SHOWS EVERY DECISION AND JEV'S ODDS.</p>
+
+    <div class="stats pixel-box">
+      <h2>RUN STATS</h2>
+      <dl>
+        <div><dt>TOTAL TIME</dt><dd>37H 40M</dd></div>
+        <div><dt>DECISIONS MADE</dt><dd>16,150</dd></div>
+        <div><dt>INPUT TOKENS</dt><dd>~39.2M</dd></div>
+        <div><dt>AVG DECISION TIME</dt><dd>2.8S</dd></div>
+        <div><dt>OPPONENTS FOUGHT</dt><dd>~1,660</dd></div>
+        <div><dt>TEAM WIPES</dt><dd>16</dd></div>
+        <div><dt>ELITE FOUR ATTEMPTS</dt><dd>15</dd></div>
+        <div><dt>TOUGHEST STRETCH</dt><dd>VICTORY ROAD</dd></div>
+      </dl>
+      <p class="team">FINAL TEAM: CHARIZARD 83 · GRAVELER 62 · NIDOQUEEN 45 · BEEDRILL 44 · HAUNTER 39 · PRIMEAPE 29</p>
+    </div>
 
     <section>
       <div class="dialog pixel-box">
