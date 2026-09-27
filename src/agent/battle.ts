@@ -5,6 +5,11 @@ import { advanceText, isNamingScreen, dialogStep } from './dialog.js';
 import { sym } from '../game/symbols.js';
 
 const PHYSICAL = new Set(['NORMAL', 'FIGHTING', 'FLYING', 'POISON', 'GROUND', 'ROCK', 'BUG', 'GHOST']);
+/** The "Use item on which POKéMON?" party list can take a while to draw: wait for it (capped) before moving the cursor. */
+function waitForPartyPick(ctx: Ctx) {
+  for (let i = 0; i < 150 && !/which/.test(ctx.gs.screen().rows.join(' ')); i++) ctx.emu.wait(1);
+  ctx.emu.wait(4);
+}
 const HEAL: Record<string, number> = { POTION: 20, 'SUPER POTION': 50, 'HYPER POTION': 200, 'MAX POTION': 999, 'FULL RESTORE': 999, 'FRESH WATER': 50, 'SODA POP': 60, LEMONADE: 80 };
 const BALLS = ['POKé BALL', 'GREAT BALL', 'ULTRA BALL', 'MASTER BALL', 'SAFARI BALL'];
 
@@ -121,7 +126,7 @@ async function decideBattle(ctx: Ctx) {
       opts[key] = `Heal the active Pokémon by up to ${HEAL[it.name]} HP (currently ${b.player.hp}/${b.player.maxHp}). ${it.qty} left. Uses the turn.`;
       actions[key] = () => {
         if (!select(ctx, 'ITEM')) return; if (!cursorTo(ctx, it.name)) { tap(ctx, 'B', 20); return; } confirmA(ctx);
-        ctx.emu.wait(20); cursorToIndex(ctx, b.player.slot); confirmA(ctx);
+        waitForPartyPick(ctx); cursorToIndex(ctx, b.player.slot); confirmA(ctx);
       };
     }
     // Revive a fainted teammate (they come back but stay benched until switched in)
@@ -131,7 +136,7 @@ async function decideBattle(ctx: Ctx) {
         opts[key] = `Revive fainted ${p.nickname} (${p.species} Lv${p.level}) to ${it.name === 'MAX REVIVE' ? 'full' : 'half'} HP. It stays out of battle until switched in. ${it.qty} left. Uses the turn.`;
         actions[key] = () => {
           if (!select(ctx, 'ITEM')) return; if (!cursorTo(ctx, it.name)) { tap(ctx, 'B', 20); return; } confirmA(ctx);
-          ctx.emu.wait(20); cursorToIndex(ctx, p.slot); confirmA(ctx);
+          waitForPartyPick(ctx); cursorToIndex(ctx, p.slot); confirmA(ctx);
         };
       }
     }
@@ -142,7 +147,7 @@ async function decideBattle(ctx: Ctx) {
       opts[key] = `Cures ${party[b.player.slot]?.nickname ?? 'the active Pokémon'}'s ${b.player.status.toLowerCase()} status. ${it.qty} left. Uses the turn.`;
       actions[key] = () => {
         if (!select(ctx, 'ITEM')) return; if (!cursorTo(ctx, it.name)) { tap(ctx, 'B', 20); return; } confirmA(ctx);
-        ctx.emu.wait(20); cursorToIndex(ctx, b.player.slot); confirmA(ctx);
+        waitForPartyPick(ctx); cursorToIndex(ctx, b.player.slot); confirmA(ctx);
       };
     }
     if (/BALL$/.test(it.name) && b.kind === 'wild') {
