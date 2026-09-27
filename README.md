@@ -2,7 +2,22 @@
 
 [Jev](https://en.wikipedia.org/wiki/Jev_(AI_model)), TypeSafe AI's decision model, plays Pokémon Red. There are no scripts or cheats: the harness reads the game's memory, lists the legal options with some facts about each, and Jev picks one.
 
-Landing page: [`site/`](site/)
+Landing page: [jev-pokemon.vercel.app](https://jev-pokemon.vercel.app) ([`site/`](site/))
+
+## Result
+
+Jev beat the game. The live stream ran on YouTube from Sep 25 to Sep 26, 2026 and has ended. The highlights are on the landing page.
+
+| | |
+|---|---|
+| Total time | 37h 40m |
+| Decisions made | 16,150 |
+| Input tokens | ~39.2M |
+| Total Jev cost | ~$1.65 |
+| Typical decision time | ~0.4s |
+| Team wipes | 16 (14 at the Elite Four) |
+| Elite Four attempts | 15 |
+| Final team | Charizard 83, Graveler 62, Nidoqueen 45, Beedrill 44, Haunter 39, Primeape 29 |
 
 > You need your own legally obtained copy of Pokémon Red. No ROM is included or distributed here. See [Legal](#legal).
 
@@ -100,7 +115,7 @@ npx tsx scripts/tools/save.ts                  # save the running game (writes s
 2. Set **Root Directory** to `site`.
 3. Deploy.
 
-The video embed and repo link are in `site/index.html`.
+The highlights video (`site/highlights.mp4`) and links are in `site/index.html`.
 
 ## Legal
 
