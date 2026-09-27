@@ -4,9 +4,9 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Jev Plays Pokémon Red</title>
-<meta name="description" content="The AI decision model Jev played Pokémon Red all the way to the Hall of Fame. Watch the full recording." />
+<meta name="description" content="The AI decision model Jev played Pokémon Red all the way to the Hall of Fame. Watch the finale." />
 <meta property="og:title" content="Jev beat Pokémon Red" />
-<meta property="og:description" content="The AI decision model Jev played Pokémon Red all the way to the Hall of Fame. Watch the full recording." />
+<meta property="og:description" content="The AI decision model Jev played Pokémon Red all the way to the Hall of Fame. Watch the finale." />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://jev-pokemon.vercel.app/" />
 <meta property="og:image" content="https://jev-pokemon.vercel.app/og.png?v=2" />
@@ -15,7 +15,7 @@
 <meta property="og:image:alt" content="Jev plays Pokémon Red: a pixel-art handheld showing Jev deciding between options with odds" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Jev beat Pokémon Red" />
-<meta name="twitter:description" content="The AI decision model Jev played Pokémon Red all the way to the Hall of Fame. Watch the full recording." />
+<meta name="twitter:description" content="The AI decision model Jev played Pokémon Red all the way to the Hall of Fame. Watch the finale." />
 <meta name="twitter:image" content="https://jev-pokemon.vercel.app/og.png?v=2" />
 <meta name="theme-color" content="#0f380f" />
 <link rel="icon" href="favicon.svg" type="image/svg+xml" />
@@ -101,7 +101,7 @@
   .bezel-top .led { width: 8px; height: 8px; background: var(--red); box-shadow: 0 0 6px var(--red); }
   .bezel-top .rule { flex: 1; height: 4px; background: repeating-linear-gradient(90deg, #7d3a5e 0 40%, transparent 40% 50%, #2f3f86 50% 90%, transparent 90%); opacity: 0.8; }
   .screen { position: relative; aspect-ratio: 16 / 9; background: var(--darkest); box-shadow: 0 0 0 4px var(--darkest); }
-  .screen iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .screen iframe, .screen video { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: var(--darkest); image-rendering: pixelated; object-fit: contain; }
   .brand { margin-top: 14px; color: #2f3f86; font-size: 13px; font-style: italic; }
   .brand b { color: #7d3a5e; font-style: normal; }
   .hint { color: var(--light); font-size: 10px; line-height: 2; margin: 8px 0 0; }
@@ -149,9 +149,9 @@
   <header class="wrap">
     <div class="live"><i class="done"></i>GAME COMPLETE · HALL OF FAME</div>
     <h1>JEV PLAYS<br /><span>POKéMON RED</span></h1>
-    <p class="lede">The AI decision model Jev played Pokémon Red all the way to the Hall of Fame. The live stream has ended; watch the full recording below.</p>
+    <p class="lede">The AI decision model Jev played Pokémon Red all the way to the Hall of Fame. The live stream has ended. Below: the finale, from beating the Champion to the Hall of Fame, played back from the final save.</p>
     <div class="actions">
-      <a class="btn" href="https://www.youtube.com/watch?v=1HMOA3BawXg" target="_blank" rel="noopener"><span class="arrow">▶</span>WATCH THE RECORDING</a>
+      <a class="btn" href="https://www.youtube.com/watch?v=1HMOA3BawXg" target="_blank" rel="noopener"><span class="arrow">▶</span>STREAM ON YOUTUBE</a>
       <a class="btn alt" href="https://github.com/christianmat/jev-pokemon" target="_blank" rel="noopener">SOURCE CODE</a>
     </div>
   </header>
@@ -159,15 +159,14 @@
   <main class="wrap">
     <div class="console">
       <div class="bezel">
-        <div class="bezel-top"><span class="led"></span><span>JEV REPLAY</span><span class="rule"></span></div>
+        <div class="bezel-top"><span class="led"></span><span>THE FINALE</span><span class="rule"></span></div>
         <div class="screen">
-          <iframe src="https://www.youtube.com/embed/1HMOA3BawXg?rel=0" title="Jev plays Pokémon Red, full recording"
-            allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
+          <video src="finale.mp4" poster="finale.jpg" controls playsinline preload="metadata" title="Jev plays Pokémon Red: the finale and Hall of Fame"></video>
         </div>
       </div>
       <div class="brand"><b>JEV</b> BOY</div>
     </div>
-    <p class="hint">THE FULL RUN, FROM PALLET TOWN TO THE HALL OF FAME.<br />THE RIGHT PANEL SHOWS EVERY DECISION AND JEV'S ODDS.</p>
+    <p class="hint">THE FINALE, NO SOUND. THE STREAM RAN 38 HOURS; YOUTUBE MAY ONLY KEEP PART OF IT ONCE IT FINISHES PROCESSING.</p>
 
     <div class="stats pixel-box">
       <h2>RUN STATS</h2>
