@@ -66,6 +66,8 @@ async function decideBattle(ctx: Ctx) {
   const ballsLeft = gs.bag().filter((i) => /BALL$/.test(i.name)).reduce((a, i) => a + i.qty, 0);
   const catching = focus === 'catch' && ballsLeft > 0;
 
+  // a frozen / sleeping Pokémon can't use its moves (Gen 1: freezing never wears off by itself)
+  const cantAct = b.player.status === 'FREEZE' ? 'FROZEN: this Pokémon cannot use any move (the turn is lost). In Gen 1 freezing never wears off by itself: only an ICE HEAL / FULL HEAL / FULL RESTORE, or being hit by a Fire move, thaws it. ' : b.player.status === 'SLEEP' ? 'ASLEEP: this Pokémon cannot use a move until it wakes up (sleep lasts 1-7 turns). ' : '';
   for (const mv of b.player.moves) {
     const eff = rom.effectiveness(mv.type, b.enemy.types);
     const phys = PHYSICAL.has(mv.type);
@@ -91,7 +93,7 @@ async function decideBattle(ctx: Ctx) {
     };
     if (SPECIAL[mv.name] && mv.pp > 0) {
       const ghostImmune = eff === 0 ? ` NO effect against ${b.enemy.types.join('/')}.` : '';
-      opts[key] = `${mv.name}: ${mv.type} move, ${mv.pp} PP left. ${SPECIAL[mv.name]}${ghostImmune}`;
+      opts[key] = `${cantAct}${mv.name}: ${mv.type} move, ${mv.pp} PP left. ${SPECIAL[mv.name]}${ghostImmune}`;
       actions[key] = () => { if (!select(ctx, 'FIGHT')) return; if (cursorTo(ctx, mv.name)) confirmA(ctx); else tap(ctx, 'B', 20); };
       continue;
     }
@@ -108,7 +110,7 @@ async function decideBattle(ctx: Ctx) {
     // stat stages in play (e.g. the enemy used MINIMIZE / DOUBLE TEAM, or SAND-ATTACK lowered our accuracy)
     const hit = hitChance(ctx, mv.accuracy);
     const hitNote = hit !== undefined && hit !== mv.accuracy ? ` Hit chance right now about ${hit}% (${hitWhy(ctx)}).` : '';
-    opts[key] = mv.pp === 0 ? `${mv.name}: 0 PP left, unusable.` : `${mv.name}: ${mv.type} move, power ${mv.power}, accuracy ${mv.accuracy}%, ${mv.pp} PP left.${hitNote} ${effNote}${dmg}${SIDE[mv.name] ?? ''}`;
+    opts[key] = mv.pp === 0 ? `${mv.name}: 0 PP left, unusable.` : `${cantAct}${mv.name}: ${mv.type} move, power ${mv.power}, accuracy ${mv.accuracy}%, ${mv.pp} PP left.${hitNote} ${effNote}${dmg}${SIDE[mv.name] ?? ''}`;
     actions[key] = () => { if (!select(ctx, 'FIGHT')) return; if (cursorTo(ctx, mv.name)) confirmA(ctx); else tap(ctx, 'B', 20); };
   }
 
@@ -151,7 +153,7 @@ async function decideBattle(ctx: Ctx) {
       }
     }
     // Cure the active Pokémon's status
-    const CURES: Record<string, string[]> = { ANTIDOTE: ['POISON'], 'BURN HEAL': ['BURN'], 'ICE HEAL': ['FREEZE'], AWAKENING: ['SLEEP'], 'PARLYZ HEAL': ['PARALYZED'], 'FULL HEAL': ['POISON', 'BURN', 'FREEZE', 'SLEEP', 'PARALYZED'] };
+    const CURES: Record<string, string[]> = { ANTIDOTE: ['POISON'], 'BURN HEAL': ['BURN'], 'ICE HEAL': ['FREEZE'], AWAKENING: ['SLEEP'], 'PARLYZ HEAL': ['PARALYZED'], 'FULL HEAL': ['POISON', 'BURN', 'FREEZE', 'SLEEP', 'PARALYZED'], ...(b.player.hp >= b.player.maxHp ? { 'FULL RESTORE': ['POISON', 'BURN', 'FREEZE', 'SLEEP', 'PARALYZED'] } : {}) };
     if (CURES[it.name]?.includes(b.player.status)) {
       const key = `Use ${it.name}`;
       opts[key] = `Cures ${party[b.player.slot]?.nickname ?? 'the active Pokémon'}'s ${b.player.status.toLowerCase()} status. ${it.qty} left. Uses the turn.`;
