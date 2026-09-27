@@ -329,6 +329,13 @@ export async function decideMenu(ctx: Ctx, purpose: string, extraFacts: (label: 
   };
   const bagSlots = ctx.gs.bag().length;
   const tossFacts = (label: string) => !tossPrompt ? '' : label === 'YES' ? `Throws the item away for good and frees a bag slot (the bag holds ${bagSlots} of 20 item slots${bagSlots >= 20 ? '; while it is full, items on the ground can\'t be picked up' : ''}).` : label === 'NO' ? `Keeps the item; the bag stays at ${bagSlots} of 20 slots.` : '';
+  // "Will <player> change POKéMON?" (after knocking out a trainer's Pokémon): who else could come in
+  const changePrompt = /change POK/.test(screenText.replace(/\s*\/\s*/g, ' '));
+  const others = ctx.gs.party().filter((p, i) => p.hp > 0 && i !== ctx.gs.u8('wPlayerMonNumber'));
+  if (changePrompt) {
+    MENU_FACTS.YES = others.length ? `Switch in another team member before the trainer's next Pokémon (able to battle: ${others.map((p) => `${p.nickname} ${p.hp}/${p.maxHp} HP`).join(', ')}).` : 'No other team member can battle (all others fainted): choosing YES does nothing.';
+    MENU_FACTS.NO = 'Keep the current Pokémon in battle.';
+  }
   const switchFacts = (label: string) => !switchPrompt ? '' : label === 'YES' ? `Presses the switch: all gates in this building flip. ${ctx.mem.switchFact ?? ''}` : label === 'NO' ? 'Leaves the switch and the gates as they are.' : '';
   for (const o of opts) criteria[o.text] = `Menu option "${o.text}". ${pcListNote(o.text)} ${MENU_FACTS[o.text] ?? ''} ${floorFact(o.text)} ${pcFact(o.text)} ${itemRule(o.text)} ${extraFacts(o.text) || boxFacts(o.text) || partyFacts(o.text)} ${price(o.text)} ${switchFacts(o.text)} ${tossFacts(o.text)} ${/ITEM/.test(screenText) || selling || ctx.gs.bag().length >= 20 ? bagItem(o.text) : ''}`.replace(/\s+/g, ' ').trim();
   // Mechanics Jev can always use: scroll a list that has more entries, and back out of any menu.
