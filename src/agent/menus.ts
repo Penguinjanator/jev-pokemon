@@ -253,8 +253,8 @@ export async function decideMenu(ctx: Ctx, purpose: string, extraFacts: (label: 
   }
   // BILL's PC: what each mode does, and what's in the box / team for the pick lists
   const PC_FACTS: [RegExp, string][] = [
-    [/^WITHDRAW/, `Move a Pokémon from the box to the team (the team holds 6).${ctx.gs.party().length >= 6 ? ' Your team is full (6/6), so nothing can be withdrawn until a team member is deposited.' : ''}${ctx.gs.box().length ? '' : ' The box is empty.'}`],
-    [/^DEPOSIT/, 'Move a team member into the box (at least one must stay on the team).'],
+    [/^WITHDRAW/, `Move a Pokémon from the box to the team (the team holds 6).${ctx.gs.party().length >= 6 ? ' Your team is full (6/6), so nothing can be withdrawn until a team member is deposited.' : ''}${ctx.gs.box().length ? ` In the box: ${ctx.gs.box().map((m) => `${m.nickname} (${m.species} Lv${m.level}, ${m.types.join('/')})`).join(', ')}.` : ' The box is empty.'}`],
+    [/^DEPOSIT/, `Move a team member into the box (at least one must stay on the team).${ctx.gs.party().length >= 6 && ctx.gs.box().length ? ' Frees a team slot so a box Pokémon can be withdrawn.' : ''}`],
     [/^RELEASE/, 'Permanently lets a Pokémon in the box go. It is gone for good.'],
     [/^CHANGE BOX/, 'Switch to another PC box.'],
     [/^SEE YA/, "Leave BILL's PC."],
