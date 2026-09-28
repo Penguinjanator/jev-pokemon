@@ -14,7 +14,7 @@ Jev beat the game. The live stream ran on YouTube from Sep 25 to Sep 26, 2026 an
 | Decisions made | 16,150 |
 | Input tokens | ~39.2M |
 | Total Jev cost | ~$1.65 |
-| Typical decision time | ~0.4s |
+| Median decision time | ~0.4s |
 | Team wipes | 16 (14 at the Elite Four) |
 | Elite Four attempts | 15 |
 | Final team | Charizard 83, Graveler 62, Nidoqueen 45, Beedrill 44, Haunter 39, Primeape 29 |
